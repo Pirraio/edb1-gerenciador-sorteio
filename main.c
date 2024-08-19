@@ -21,14 +21,18 @@ int main() {
     do {
         menu();
         printf("Escolha uma opção: ");
-        scanf("%d", &opcao);
+        if (scanf("%d", &opcao) != 1) { //Caso a entrada seja inválida
+        while (getchar() != '\n');
+        printf("Opção inválida. Por favor, tente novamente.\n");
+        continue;
+        }
 
-        switch (opcao) {
-            case 1: {
+        switch (opcao) { // Switch case para as opções
+            case 1: { // Insere um concurso
                 Concurso concurso;
                 printf("Número do Concurso: ");
                 scanf("%d", &concurso.numero);
-                if (buscarConcurso(&tabela, concurso.numero) != NULL) {
+                if (buscarConcurso(&tabela, concurso.numero) != NULL) { // Verifica se o concurso já existe 
                     printf("Esse concurso já existe, adicionar irá sobrescrever o existente. Tem certeza que quer continuar? (S/N)\n");
                     char resposta;
                     scanf(" %c", &resposta);
@@ -47,7 +51,7 @@ int main() {
                 printf("\nConcurso inserido com sucesso.\n");
                 break;
         }
-            case 2: {
+            case 2: { // Busca um concurso
                 int numero;
                 printf("Número do Concurso: ");
                 scanf("%d", &numero);
@@ -62,7 +66,7 @@ int main() {
                 }
                 break;
             }
-            case 3: {
+            case 3: { // Remove um concurso
                 int numero;
                 printf("Número do Concurso: ");
                 scanf("%d", &numero);
@@ -74,7 +78,7 @@ int main() {
                 }
                 break;
             }
-            case 4: {
+            case 4: { // Visualiza todos os concursos
                 for (int i = 0; i < TAMANHO_TABELA; i++) {
                     No* atual = tabela.tabela[i];
                     while (atual != NULL) {
@@ -88,7 +92,7 @@ int main() {
                 }
                 break;
             }
-            case 5: {
+            case 5: { // Carrega concursos de um arquivo
                 char nomeArquivo[256];
                 printf("Nome do Arquivo (ex: data/sorteios.csv): ");
                 scanf("%s", nomeArquivo);
@@ -96,7 +100,7 @@ int main() {
                 printf("Concursos carregados com sucesso.\n");
                 break;
             }
-            case 6: {
+            case 6: { // Apresenta estatísticas
                 int numeroEspecifico, anoEspecifico;
                 printf("Número (quantas vezes foi sorteado): ");
                 scanf("%d", &numeroEspecifico);
