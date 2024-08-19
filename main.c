@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include "gerenciador.h"
 
-void menu() {
+void menu() { // Menu de opções
+    printf("========================================\n");
     printf("1. Inserir Concurso\n");
     printf("2. Buscar Concurso\n");
     printf("3. Remover Concurso\n");
@@ -9,6 +10,7 @@ void menu() {
     printf("5. Carregar Concursos de um Arquivo\n");
     printf("6. Apresentar Estatísticas\n");
     printf("7. Sair\n");
+    printf("========================================\n");
 }
 
 int main() {
@@ -26,6 +28,15 @@ int main() {
                 Concurso concurso;
                 printf("Número do Concurso: ");
                 scanf("%d", &concurso.numero);
+                if (buscarConcurso(&tabela, concurso.numero) != NULL) {
+                    printf("Esse concurso já existe, adicionar irá sobrescrever o existente. Tem certeza que quer continuar? (S/N)\n");
+                    char resposta;
+                    scanf(" %c", &resposta);
+                    if (resposta != 'S' && resposta != 's') {
+                        printf("Operação cancelada.\n");
+                        break;
+                    }
+                }
                 printf("Data do Sorteio (dd-mm-aaaa): ");
                 scanf("%s", concurso.data);
                 printf("Números Sorteados: ");
@@ -33,8 +44,9 @@ int main() {
                     scanf("%d", &concurso.numeros[i]);
                 }
                 inserirConcurso(&tabela, concurso);
+                printf("\nConcurso inserido com sucesso.\n");
                 break;
-            }
+        }
             case 2: {
                 int numero;
                 printf("Número do Concurso: ");
@@ -55,6 +67,11 @@ int main() {
                 printf("Número do Concurso: ");
                 scanf("%d", &numero);
                 removerConcurso(&tabela, numero);
+                if (removerConcurso(&tabela, numero) == 1) {
+                    printf("Remoção bem sucedida");
+                } else {
+                    printf("Concurso não encontrado \n \n");
+                }
                 break;
             }
             case 4: {
@@ -73,13 +90,19 @@ int main() {
             }
             case 5: {
                 char nomeArquivo[256];
-                printf("Nome do Arquivo (data/sorteios.csv): ");
+                printf("Nome do Arquivo (ex: data/sorteios.csv): ");
                 scanf("%s", nomeArquivo);
                 carregarConcursos(&tabela, nomeArquivo);
+                printf("Concursos carregados com sucesso.\n");
                 break;
             }
             case 6: {
-                apresentarEstatisticas(&tabela);
+                int numeroEspecifico, anoEspecifico;
+                printf("Número (quantas vezes foi sorteado): ");
+                scanf("%d", &numeroEspecifico);
+                printf("Ano (quantidade de concursos nesse ano): ");
+                scanf("%d", &anoEspecifico);
+                apresentarEstatisticas(&tabela, numeroEspecifico, anoEspecifico);
                 break;
             }
             case 7:

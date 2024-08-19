@@ -3,17 +3,18 @@
 #include <string.h>
 #include "gerenciador.h"
 
-void inicializarTabela(TabelaDispersao* tabela) {
+
+void inicializarTabela(TabelaDispersao* tabela) { // Inicializa a tabela de dispersão
     for (int i = 0; i < TAMANHO_TABELA; i++) {
         tabela->tabela[i] = NULL;
     }
 }
 
-int funcaoDispersao(int numero) {
+int funcaoDispersao(int numero) { 
     return numero % TAMANHO_TABELA;
 }
 
-void inserirConcurso(TabelaDispersao* tabela, Concurso concurso) {
+void inserirConcurso(TabelaDispersao* tabela, Concurso concurso) { // Insere um concurso na tabela de dispersão
     int indice = funcaoDispersao(concurso.numero);
     No* novoNo = (No*)malloc(sizeof(No));
     novoNo->concurso = concurso;
@@ -21,7 +22,7 @@ void inserirConcurso(TabelaDispersao* tabela, Concurso concurso) {
     tabela->tabela[indice] = novoNo;
 }
 
-Concurso* buscarConcurso(TabelaDispersao* tabela, int numero) {
+Concurso* buscarConcurso(TabelaDispersao* tabela, int numero) { // Busca um concurso na tabela de dispersão
     int indice = funcaoDispersao(numero);
     No* atual = tabela->tabela[indice];
     while (atual != NULL) {
@@ -33,7 +34,7 @@ Concurso* buscarConcurso(TabelaDispersao* tabela, int numero) {
     return NULL;
 }
 
-void removerConcurso(TabelaDispersao* tabela, int numero) {
+int removerConcurso(TabelaDispersao* tabela, int numero) { // Remove um concurso da tabela de dispersão
     int indice = funcaoDispersao(numero);
     No* atual = tabela->tabela[indice];
     No* anterior = NULL;
@@ -45,14 +46,15 @@ void removerConcurso(TabelaDispersao* tabela, int numero) {
                 anterior->proximo = atual->proximo;
             }
             free(atual);
-            return;
+            return 1; // Retornar 1 se remoção bem-sucedida
         }
         anterior = atual;
         atual = atual->proximo;
     }
+    return 0; // se concurso não encontrado
 }
 
-void carregarConcursos(TabelaDispersao* tabela, const char* nomeArquivo) {
+void carregarConcursos(TabelaDispersao* tabela, const char* nomeArquivo) { // Carrega concursos de um arquivo (.csv ou .tsv)
     FILE* arquivo = fopen(nomeArquivo, "r");
     if (arquivo == NULL) {
         perror("Erro ao abrir arquivo");
@@ -74,6 +76,54 @@ void carregarConcursos(TabelaDispersao* tabela, const char* nomeArquivo) {
     fclose(arquivo);
 }
 
-void apresentarEstatisticas(TabelaDispersao* tabela) {
-    // Implementar funções para calcular e apresentar estatísticas
+int compararFrequencia(const void* a, const void* b) { // Compara a frequência de dois números
+    return ((NumeroFrequencia*)b)->frequencia - ((NumeroFrequencia*)a)->frequencia;
+}
+
+void apresentarEstatisticas(TabelaDispersao* tabela, int numeroEspecifico, int anoEspecifico) { // Apresenta estatísticas sobre os concursos
+    int quantidadeNumeroEspecifico = 0;
+    int quantidadeConcursosAno = 0;
+    
+    NumeroFrequencia frequencias[60] = {0};
+    for (int i = 0; i < 60; i++) {
+        frequencias[i].numero = i + 1;
+        frequencias[i].frequencia = 0;
+    }
+
+    for (int i = 0; i < TAMANHO_TABELA; i++) {
+        No* atual = tabela->tabela[i];
+        while (atual != NULL) {
+            Concurso concurso = atual->concurso;
+            char anoStr[5];
+            strncpy(anoStr, concurso.data + 6, 4);
+            anoStr[4] = '\0';
+            int ano = atoi(anoStr);
+            if (ano == anoEspecifico) {
+                quantidadeConcursosAno++;
+            }
+            for (int j = 0; j < 6; j++) {
+                int numero = concurso.numeros[j];
+                frequencias[numero - 1].frequencia++;
+                if (numero == numeroEspecifico) {
+                    quantidadeNumeroEspecifico++;
+                }
+            }
+            atual = atual->proximo;
+        }
+    }
+
+    qsort(frequencias, 60, sizeof(NumeroFrequencia), compararFrequencia);
+
+    printf("Quantidade de vezes que o número %d foi sorteado: %d\n", numeroEspecifico, quantidadeNumeroEspecifico);
+    printf("Dez números mais sorteados:\n");
+    for (int i = 0; i < 10; i++) {
+        printf("%d: %d vezes\n", frequencias[i].numero, frequencias[i].frequencia);
+    }
+
+    printf("Dez números menos sorteados:\n");
+    for (int i = 59; i >= 50; i--) {
+        printf("%d: %d vezes\n", frequencias[i].numero, frequencias[i].frequencia);
+    }
+
+    printf("Quantidade de concursos no ano %d: %d\n", anoEspecifico, quantidadeConcursosAno);
 }
