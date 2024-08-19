@@ -70,9 +70,9 @@ int main() {
                 int numero;
                 printf("Número do Concurso: ");
                 scanf("%d", &numero);
-                removerConcurso(&tabela, numero);
-                if (removerConcurso(&tabela, numero) == 1) {
-                    printf("Remoção bem sucedida");
+                int response = removerConcurso(&tabela, numero);
+                if (response == 1) {
+                    printf("Remoção bem sucedida\n \n");
                 } else {
                     printf("Concurso não encontrado \n \n");
                 }
@@ -97,7 +97,6 @@ int main() {
                 printf("Nome do Arquivo (ex: data/sorteios.csv): ");
                 scanf("%s", nomeArquivo);
                 carregarConcursos(&tabela, nomeArquivo);
-                printf("Concursos carregados com sucesso.\n");
                 break;
             }
             case 6: { // Apresenta estatísticas

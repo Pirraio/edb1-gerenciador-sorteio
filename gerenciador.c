@@ -74,6 +74,9 @@ void carregarConcursos(TabelaDispersao* tabela, const char* nomeArquivo) { // Ca
     }
 
     fclose(arquivo);
+
+    printf("Concursos carregados com sucesso.\n");
+
 }
 
 int compararFrequencia(const void* a, const void* b) { // Compara a frequência de dois números
